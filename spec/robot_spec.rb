@@ -24,5 +24,10 @@ describe Robot do
     robot.command_sequence.should == 'LRLRLRLFFFRF'
   end
   
+  it "doesn't approve position without orientation" do
+    robot = Robot.new({:x => 1, :y => 2}, 'RFRFRRLFF')
+    robot.position.should be_nil
+  end
+  
   
 end

@@ -12,13 +12,10 @@ EXIT_COMMANDS = ['x', 'X', 'exit', 'EXIT', 'n', 'N']
 
 # Array for storing command sequences for all robots
 @robots = []
-@robo_inputs = []
-
 @new_robot_command = []
 
 # Main app loop
 while !EXIT_COMMANDS.include?( @exit_command[0] )
-  @robo_inputs.clear
   @robots.clear
   
   puts "--------- GAME OF ROBOTS -----------"
@@ -64,8 +61,8 @@ while !EXIT_COMMANDS.include?( @exit_command[0] )
           "Initial position (ex: 1 1 E): <%= color('>', GREEN) %>  ",
           lambda { |str| str.split(/ \s*/) })
           
-          robot.set_start_position({:x => @init_position[0], 
-                                    :y => @init_position[1], 
+          robot.set_start_position({:x => @init_position[0].to_i, 
+                                    :y => @init_position[1].to_i, 
                                     :orientation => @init_position[2]})
       end
       

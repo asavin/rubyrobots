@@ -11,9 +11,8 @@ class Robot
   end
   
   def set_start_position(position)
-    position[:orientation].upcase!
-    
     if validate_position(position)
+      position[:orientation].upcase!
       @position = position
     end
   end
@@ -125,6 +124,12 @@ private
   end
 
   def validate_position(position)
+    if position[:orientation]
+      position[:orientation].upcase!
+    else
+      return false
+    end
+    
     if position.is_a?(Hash) &&
        position[:x].is_a?(Integer) && 
        position[:y].is_a?(Integer) &&

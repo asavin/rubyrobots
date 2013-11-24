@@ -7,7 +7,7 @@ require './robot'
 require './world'
 
 # Initializing values
-@exit_commands = ['x', 'X', 'exit', 'EXIT', 'n', 'N']
+EXIT_COMMANDS = ['x', 'X', 'exit', 'EXIT', 'n', 'N']
 @exit_command = []
 
 # Array for storing command sequences for all robots
@@ -17,7 +17,7 @@ require './world'
 @new_robot_command = []
 
 # Main app loop
-while !@exit_commands.include?( @exit_command[0] )
+while !EXIT_COMMANDS.include?( @exit_command[0] )
   @robo_inputs.clear
   @robots.clear
   
@@ -44,7 +44,7 @@ while !@exit_commands.include?( @exit_command[0] )
   
   puts "Now enter commands and positions for the desired amount of robots"
   
-  while !@exit_commands.include?( @new_robot_command[0] )
+  while !EXIT_COMMANDS.include?( @new_robot_command[0] )
     @init_position = ask(
       "Initial position (ex: 1 1 E): <%= color('>', GREEN) %>  ",
       lambda { |str| str.split(/ \s*/) })
@@ -53,10 +53,50 @@ while !@exit_commands.include?( @exit_command[0] )
       "Command sequence (ex: RFRFLFF): <%= color('>', GREEN) %>  ",
       lambda { |str| str.split(/ \s*/) })
     
+      robot = Robot.new({:x => @init_position[0].to_i, 
+                         :y => @init_position[1].to_i, 
+                         :orientation => @init_position[2]},
+                         @command_sequence[0])
+                         
+      while robot.position.nil?
+        puts "Incorrect initial position. Please try again."
+        @init_position = ask(
+          "Initial position (ex: 1 1 E): <%= color('>', GREEN) %>  ",
+          lambda { |str| str.split(/ \s*/) })
+          
+          robot.set_start_position({:x => @init_position[0], 
+                                    :y => @init_position[1], 
+                                    :orientation => @init_position[2]})
+      end
+      
+      while robot.command_sequence.nil?
+        puts "Incorrect command sequence. Please try again."
+        @command_sequence = ask(
+          "Command sequence (ex: RFRFLFF): <%= color('>', GREEN) %>  ",
+          lambda { |str| str.split(/ \s*/) })
+          
+          robot.set_command_sequence(@command_sequence[0])
+      end
+      
+      # Pushing validated robot into the command stack
+      @robots << robot
+    
+    
     @new_robot_command = ask(
       "Input another robot? ([Y]/n): <%= color('>', GREEN) %>  ",
       lambda { |str| str.split(/ \s*/) })
   
+  end
+  
+  # All ready, calculate positions for every robot
+  # and print out results
+  puts "\n\nCalculating positions for each robot"
+  @robots.each do |robot|
+    robot.calculate_position(@world)
+    puts "\n#{robot.position[:x]} #{robot.position[:y]} #{robot.position[:orientation]}"
+    if robot.position[:lost]
+      puts "LOST"
+    end
   end
   
   @exit_command = ask(
